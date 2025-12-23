@@ -78,6 +78,9 @@ https://github.com/fudan-zvg/4d-gaussian-splatting/assets/45744267/6bd0b57b-4857
 
 https://github.com/fudan-zvg/4d-gaussian-splatting/assets/45744267/2c79974c-1867-4ce6-848b-5d31679b6067
 
+
+# Relay-GS
+
 <img width="837" height="457" alt="image" src="https://github.com/user-attachments/assets/3e261e56-9bc5-4cac-b13c-63d2d4f286f4" />
 
 여기서 부터 diff-gaussian-rasterzation-dubug 파일을 사용하셔야 합니다 폴더 뒤의 -dubug 삭제하고 폴더를 덮어 씌우세요 
