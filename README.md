@@ -1,19 +1,56 @@
-# Differential Gaussian Rasterization
+# Render Sorting Analysis (`render_sort.py`)
 
-Used as the rasterization engine for the paper "3D Gaussian Splatting for Real-Time Rendering of Radiance Fields". If you can make use of it in your own research, please be so kind to cite us.
+이 문서는 원본 렌더링 스크립트를 수정한 `render_sort.py`의 기능을 설명합니다. 이 스크립트의 주된 목적은 가우시안 스플래팅 렌더링 파이프라인의 다양한 정렬 전략에 대한 상세한 분석과 디버깅을 허용하는 것입니다.
 
-<section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@Article{kerbl3Dgaussians,
-      author       = {Kerbl, Bernhard and Kopanas, Georgios and Leimk{\"u}hler, Thomas and Drettakis, George},
-      title        = {3D Gaussian Splatting for Real-Time Radiance Field Rendering},
-      journal      = {ACM Transactions on Graphics},
-      number       = {4},
-      volume       = {42},
-      month        = {July},
-      year         = {2023},
-      url          = {https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/}
-}</code></pre>
-  </div>
-</section>
+## 개요
+
+`render_sort.py` 스크립트는 기본 C++ 기반 정렬 메커니즘과 새로운 Python 기반 정렬 구현 간을 전환하는 기능을 도입합니다. 또한 정렬 및 렌더링 단계 전에 가우시안 프리미티브의 상태를 검사할 수 있는 광범위한 디버깅 기능을 제공합니다.
+
+## 주요 기능
+
+### 1. 전환 가능한 정렬 구현
+
+`--use_python_sorting` 플래그를 사용하여 정렬 동작을 제어할 수 있습니다.
+
+- **C++ 정렬 (기본값):** `--use_python_sorting`이 설정되지 않은 경우, 스크립트는 원래의 고도로 최적화된 C++ 래스터라이저를 사용하여 정렬합니다.
+- **Python 정렬:** `--use_python_sorting`이 설정되면 Python 기반 정렬 로직이 사용됩니다. 이를 통해 Python에서 직접 다양한 정렬 알고리즘을 쉽게 디버깅하고 실험할 수 있습니다.
+
+### 2. 증분 재정렬 (Incremental Re-sorting)
+
+Python 기반 정렬의 경우 `--resort_interval` 인수를 사용하여 가우시안을 얼마나 자주 재정렬할지 제어할 수 있습니다.
+
+- `--resort_interval N`: `N` 프레임마다 가우시안의 전체 재정렬을 강제합니다.
+- Python 정렬이 활성화된 상태에서 `N`이 `0`으로 설정되거나 제공되지 않으면, 강제적인 전역 재정렬 없이 각 프레임에서 증분 정렬을 수행합니다.
+
+### 3. 동적 출력 디렉토리
+
+스크립트는 정렬 구성에 따라 동적으로 이름이 지정된 폴더에 렌더링된 이미지를 저장하여 쉽게 비교할 수 있도록 합니다.
+
+- `renders_vanilla/`: 기본 C++ 정렬에 사용됩니다.
+- `renders_incremental_pure/`: 주기적인 재정렬이 없는 Python 정렬에 사용됩니다.
+- `renders_incremental_resort_[N]/`: 재정렬 간격이 `N`인 Python 정렬에 사용됩니다.
+
+### 4. 고급 디버깅
+
+스크립트는 정렬되기 전의 가우시안 프리미티브에 대한 상세한 디버깅 정보를 타일 단위로 출력할 수 있습니다.
+
+- **디버깅 활성화:** 스크립트 실행 시 `--debug` 플래그를 사용합니다.
+- **출력:** 스크립트는 각 프레임에 대해 `.npz` 파일을 저장하며, 각 타일에 대한 데이터를 포함합니다.
+- **데이터 형식:** 각 `.npz` 파일은 키가 타일 ID인 딕셔너리 역할을 합니다. 각 타일의 값은 `(타일 내 가우시안 수, 2)` 모양의 NumPy 배열이며, 각 행에는 `[가우시안_ID, 깊이]`가 포함됩니다.
+- **출력 디렉토리:**
+  - `renders_npz_cpp/`: C++ 정렬 파이프라인의 디버그 출력을 포함합니다.
+  - `renders_npz_python/`: Python 정렬 파이프라인의 디버그 출력을 포함합니다.
+
+## 실행 방법
+
+표준 `train.py` 또는 `render.py`와 동일한 방식으로 스크립트를 실행할 수 있지만, 정렬 및 디버깅 기능을 제어하기 위한 추가 인수가 있습니다.
+
+### 예제 명령어
+
+다음은 Python 기반 정렬, 재정렬 간격 10, 그리고 디버깅을 활성화하여 스크립트를 실행하는 예제입니다.
+
+```shell
+python render_sort.py --config [your_config.yaml] --iteration [iteration_number] --use_python_sorting --resort_interval 10 --debug
+```
+
+이렇게 하면 씬이 렌더링되고 각 프레임에 대해 정렬되지 않은 가우시안 데이터가 `renders_npz_python/` 디렉토리에 저장됩니다.
