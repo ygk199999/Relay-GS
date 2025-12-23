@@ -1,0 +1,91 @@
+{
+    "simulation_global_settings": {
+        "use_acceleration": true,
+        "output_image_path": "gscore_rendered_frame.png",
+        "log_level": "INFO",
+        "clock_frequency_ghz": 0.3,
+        "detailed_hash_sim": true,
+        "render_width_pixels": 676,
+        "render_height_pixels": 507,
+        "camera_sh_degree": 3,
+        "num_simulation_processes": 16,
+        "num_gpu_workers_per_device": 1,
+        "batch_size_multiplier": 16,
+        "gaussian_chunk_size": 640000,
+        "gfeat_buffer_size_gaussians": 6553600,
+        "simulation_mode": "4DGS"
+    },
+    "hardware_architecture": {
+        "num_parallel_pipelines": 4,
+        "ccu_config": {
+            "num_pipelines": 4,
+            "num_oiu_units": 2
+        },
+        "gsu_config": {
+            "num_pipelines": 4,
+            "bsu_channels": 16,
+            "qsu_num_pivots": 7,
+            "tile_size_x": 8,
+            "tile_size_y": 8,
+            "group_processing_dim_x": 2,
+            "group_processing_dim_y": 2
+        },
+        "vru_config": {
+            "num_pipelines": 4,
+            "gfeat_buffer_size_gaussians": 256,
+            "num_vr_cores_x": 4,
+            "num_vr_cores_y": 4,
+            "pixels_per_vr_core_x": 2,
+            "pixels_per_vr_core_y": 2
+        },
+        "core_pipeline_config": {
+            "ccu_gsu_overlap_latency": 0,
+            "gsu_vru_overlap_latency": 0
+        },
+        "memory_config": {
+            "dram_bandwidth_gb_per_sec": 51.2,
+            "bytes_per_raw_gaussian": 118,
+            "bytes_per_culling_info": 24,
+            "bytes_per_processed_gaussian": 13,
+            "bytes_per_sort_entry": 6
+        }
+    },
+    "algorithm_parameters": {
+        "alpha_threshold": 0.00392156862,
+        "transmittance_threshold": 0.0001,
+        "near_plane_distance": 0.2,
+        "scene_scale": 1.0,
+        "background_color": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "z_near_plane": 0.01,
+        "z_far_plane": 100.0
+    },
+    "cycle_costs": {
+        "ccu": {
+            "frustum_culling_check": 2,
+            "ccu_covariance_computation": 6,
+            "ccu_sh_evaluation": 5,
+            "aabb_intersect_check_per_tile": 1,
+            "obb_dot_product_op": 1,
+            "subtile_bitmap_calc_per_gaussian": 1,
+            "subtile_intersect_check_per_subtile": 1
+        },
+        "gsu": {
+            "qsu_op_per_gaussian": 4,
+            "bsu_op_per_16_gaussians": 1,
+            "sep_hash_build_op_per_gaussian": 2,
+            "sep_hash_probe_op_per_gaussian": 1
+        },
+        "vru": {
+            "alpha_computation_per_pixel": 1
+        }
+    },
+    "data_paths": {
+        "gaussian_data_dir": "data/gaussians/",
+        "camera_data_path": "data/flame_steak/cameras.json",
+        "scene_id": "point_cloud"
+    }
+}
