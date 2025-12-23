@@ -1,0 +1,52 @@
+{
+  "simulation_global_settings": {
+    "clock_frequency_ghz": 0.3
+  },
+  "hardware_architecture": {
+    "ccu_config": {
+      "num_pipelines": 4,
+      "num_oiu_units": 2
+    },
+    "gsu_config": {
+      "num_pipelines": 4,
+      "bsu_channels": 16,
+      "qsu_num_pivots": 7
+    },
+    "vru_config": {
+      "num_pipelines": 4,
+      "gfeat_buffer_size_gaussians": 256,
+      "num_vr_cores_x": 4,
+      "num_vr_cores_y": 4,
+      "pixels_per_vr_core_x": 2,
+      "pixels_per_vr_core_y": 2
+    },
+    "memory_config": {
+      "dram_bandwidth_gb_per_sec": 51.2,
+      "bytes_per_raw_gaussian": 59,
+      "bytes_per_culling_info": 24,
+      "bytes_per_processed_gaussian": 48,
+      "bytes_per_sort_entry": 6
+    }
+  },
+  "cycle_costs": {
+    "ccu": {
+      "frustum_culling_check": 2,
+      "ccu_covariance_computation": 6,
+      "ccu_sh_evaluation": 5,
+      "aabb_intersect_check_per_tile": 1,
+      "obb_dot_product_op": 1,
+      "subtile_bitmap_calc_per_gaussian": 1,
+      "subtile_intersect_check_per_subtile": 1
+    },
+    "gsu": {
+      "qsu_op_per_gaussian": 4,
+      "bsu_op_per_16_gaussians": 1,
+      
+      "sep_hash_build_op_per_gaussian": 2,
+      "sep_hash_probe_op_per_gaussian": 1
+    },
+    "vru": {
+      "alpha_computation_per_pixel": 1
+    }
+  }
+}
